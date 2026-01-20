@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCM II - Coagulopathy Interactive Case | University of Lynchburg DMSc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #C53030;
+            --primary-red-dark: #9B2C2C;
+            --primary-gray: #6B7280;
+            --dark-gray: #374151;
+            --light-bg: #F9FAFB;
+            --white: #FFFFFF;
+            --success-green: #047857;
+            --success-bg: #D1FAE5;
+            --warning-amber: #B45309;
+            --warning-bg: #FEF3C7;
+            --error-red: #B91C1C;
+            --error-bg: #FEE2E2;
+            --info-blue: #1D4ED8;
+            --info-bg: #DBEAFE;
+            --border-color: #D1D5DB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --decision-btn: #1E40AF;
+            --decision-btn-hover: #1E3A8A;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Source Sans Pro', sans-serif; font-size: 1rem; line-height: 1.6; color: var(--text-primary); background: var(--light-bg); }
+        .skip-link { position: absolute; top: -40px; left: 0; background: var(--primary-red); color: white; padding: 8px 16px; z-index: 1000; }
+        .skip-link:focus { top: 0; }
+        .header { background: white; border-bottom: 3px solid var(--primary-red); padding: 1rem 2rem; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .logo-section { display: flex; align-items: center; gap: 1rem; }
+        .logo { height: 50px; }
+        .header-title { font-family: 'Merriweather', serif; font-size: 1.25rem; color: var(--dark-gray); }
+        .progress-section { display: flex; align-items: center; gap: 1rem; }
+        .progress-bar { width: 200px; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary-red); transition: width 0.5s; width: 0%; }
+        .progress-text { font-size: 0.875rem; color: var(--text-secondary); font-weight: 600; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 320px; gap: 2rem; }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
+        .content-area { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        .section-header { background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark)); color: white; padding: 1.5rem 2rem; }
+        .section-number { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.9; }
+        .section-title { font-family: 'Merriweather', serif; font-size: 1.5rem; font-weight: 700; }
+        .section-content { padding: 2rem; }
+        .case-info { background: var(--light-bg); border-left: 4px solid var(--primary-red); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 0 8px 8px 0; }
+        .case-label { font-weight: 700; color: var(--primary-red); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .nurse-note { background: var(--warning-bg); border: 1px solid var(--warning-amber); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .nurse-note-label { font-weight: 700; color: var(--warning-amber); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .data-card { background: var(--light-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+        .data-card-title { font-weight: 700; color: var(--dark-gray); border-bottom: 2px solid var(--primary-red); padding-bottom: 0.5rem; margin-bottom: 0.75rem; }
+        .data-row { display: flex; justify-content: space-between; padding: 0.375rem 0; border-bottom: 1px solid var(--border-color); }
+        .data-row:last-child { border-bottom: none; }
+        .data-label { color: var(--text-secondary); }
+        .data-value { font-weight: 600; }
+        .abnormal { color: var(--error-red); }
+        .question-box { background: var(--info-bg); border: 2px solid var(--info-blue); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .question-number { font-weight: 700; color: var(--info-blue); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .question-text { font-size: 1.125rem; font-weight: 600; color: var(--dark-gray); }
+        .options-container { margin-top: 1.5rem; }
+        .option-type-label { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-style: italic; }
+        .option-btn { display: block; width: 100%; text-align: left; padding: 1rem 1.25rem; margin-bottom: 0.75rem; background: white; border: 2px solid var(--decision-btn); border-radius: 8px; font-size: 1rem; color: var(--decision-btn); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .option-btn:hover, .option-btn:focus { background: var(--decision-btn); color: white; transform: translateX(4px); }
+        .option-btn:focus { outline: 3px solid var(--warning-amber); outline-offset: 2px; }
+        .checkbox-option { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; margin-bottom: 0.5rem; background: white; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .checkbox-option:hover { border-color: var(--decision-btn); background: var(--light-bg); }
+        .checkbox-option.selected { border-color: var(--decision-btn); background: rgba(30, 64, 175, 0.05); }
+        .checkbox-option input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--decision-btn); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+        .submit-btn { display: inline-block; padding: 1rem 2rem; background: var(--decision-btn); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: all 0.2s; }
+        .submit-btn:hover { background: var(--decision-btn-hover); transform: translateY(-2px); }
+        .submit-btn:disabled { background: var(--border-color); cursor: not-allowed; transform: none; }
+        .feedback-panel { padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; display: none; }
+        .feedback-panel.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .feedback-correct { background: var(--success-bg); border: 2px solid var(--success-green); }
+        .feedback-partial { background: var(--warning-bg); border: 2px solid var(--warning-amber); }
+        .feedback-incorrect { background: var(--error-bg); border: 2px solid var(--error-red); }
+        .feedback-title { font-weight: 700; font-size: 1.125rem; margin-bottom: 0.75rem; }
+        .feedback-correct .feedback-title { color: var(--success-green); }
+        .feedback-partial .feedback-title { color: var(--warning-amber); }
+        .feedback-incorrect .feedback-title { color: var(--error-red); }
+        .clinical-pearl { background: white; border-radius: 6px; padding: 1rem; margin-top: 1rem; border-left: 4px solid var(--info-blue); }
+        .clinical-pearl-label { font-weight: 700; color: var(--info-blue); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .continue-btn { display: inline-block; padding: 0.875rem 1.5rem; background: var(--success-green); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: all 0.2s; }
+        .continue-btn:hover { background: #065F46; transform: translateY(-2px); }
+        .sidebar { position: sticky; top: 2rem; height: fit-content; }
+        .sidebar-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; overflow: hidden; }
+        .sidebar-header { background: var(--dark-gray); color: white; padding: 1rem; font-weight: 700; }
+        .sidebar-content { padding: 1rem; max-height: 500px; overflow-y: auto; }
+        .key-point { padding: 0.75rem; background: var(--light-bg); border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.875rem; border-left: 3px solid var(--primary-red); }
+        .key-point-title { font-weight: 700; color: var(--primary-red); margin-bottom: 0.25rem; }
+        .decision-recap { background: var(--light-bg); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+        .decision-recap-title { font-weight: 700; color: var(--dark-gray); margin-bottom: 0.75rem; font-size: 0.875rem; }
+        .decision-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.5rem 0; font-size: 0.875rem; border-bottom: 1px solid var(--border-color); }
+        .decision-item:last-child { border-bottom: none; }
+        .teg-visual { background: var(--dark-gray); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+        .teg-title { color: white; font-weight: 700; margin-bottom: 1rem; text-align: center; }
+        .teg-image { width: 100%; height: 150px; background: #1F2937; border-radius: 4px; }
+        .teg-parameters { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 1rem; }
+        .teg-param { background: rgba(255,255,255,0.1); padding: 0.75rem; border-radius: 4px; text-align: center; }
+        .teg-param-label { color: rgba(255,255,255,0.7); font-size: 0.75rem; text-transform: uppercase; }
+        .teg-param-value { color: white; font-weight: 700; font-size: 1.125rem; }
+        .teg-param-value.abnormal { color: #FCA5A5; }
+        .certificate-section { display: none; text-align: center; padding: 3rem 2rem; }
+        .certificate-section.show { display: block; }
+        .certificate { background: white; border: 4px double var(--primary-red); border-radius: 12px; padding: 3rem; max-width: 700px; margin: 0 auto; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .certificate-title { font-family: 'Merriweather', serif; font-size: 1.75rem; color: var(--primary-red); margin-bottom: 0.5rem; }
+        .certificate-subtitle { font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .certificate-name { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--dark-gray); margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-red); display: inline-block; padding: 0.5rem 2rem; }
+        .certificate-body { font-size: 1rem; margin-bottom: 2rem; line-height: 1.8; }
+        .certificate-course { font-weight: 700; color: var(--primary-red); }
+        .certificate-date { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .certificate-footer { display: flex; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .signature-block { text-align: center; }
+        .signature-line { width: 180px; border-bottom: 1px solid var(--dark-gray); margin-bottom: 0.5rem; }
+        .signature-name { font-size: 0.875rem; color: var(--text-secondary); }
+        .download-btn { display: inline-block; padding: 1rem 2rem; background: var(--primary-red); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 2rem; transition: all 0.2s; }
+        .download-btn:hover { background: var(--primary-red-dark); transform: translateY(-2px); }
+        .start-screen { text-align: center; padding: 3rem 2rem; }
+        .start-logo { height: 80px; margin-bottom: 2rem; }
+        .start-title { font-family: 'Merriweather', serif; font-size: 2rem; color: var(--dark-gray); margin-bottom: 1rem; }
+        .start-subtitle { font-size: 1.25rem; color: var(--primary-red); margin-bottom: 2rem; }
+        .objectives-box { background: var(--light-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 2rem; text-align: left; max-width: 700px; margin: 0 auto 2rem; }
+        .objectives-title { font-weight: 700; color: var(--primary-red); font-size: 1.125rem; margin-bottom: 1rem; text-align: center; }
+        .objective-item { display: flex; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .objective-item:last-child { border-bottom: none; }
+        .objective-level { background: var(--primary-red); color: white; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 700; white-space: nowrap; height: fit-content; }
+        .start-btn { display: inline-block; padding: 1.25rem 3rem; background: var(--decision-btn); color: white; border: none; border-radius: 8px; font-size: 1.25rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .start-btn:hover { background: var(--decision-btn-hover); transform: translateY(-2px); }
+        .hidden { display: none !important; }
+        @media (max-width: 768px) { .header-content { flex-direction: column; text-align: center; } .main-container { padding: 1rem; } .section-content { padding: 1.5rem; } .certificate-footer { flex-direction: column; gap: 2rem; } }
+        @media print { body { background: white; } .header, .sidebar, .progress-section { display: none; } .main-container { display: block; max-width: 100%; } }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <svg class="logo" viewBox="0 0 200 50" aria-label="DMSc Logo">
+                    <g transform="translate(0,5)"><polygon points="15,8 25,3 35,8 35,18 25,23 15,18" fill="#C53030"/><polygon points="15,22 25,17 35,22 35,32 25,37 15,32" fill="#9CA3AF"/><polygon points="0,15 10,10 20,15 20,25 10,30 0,25" fill="#C53030"/></g>
+                    <text x="50" y="35" font-family="Arial Black" font-size="28" font-weight="900"><tspan fill="#C53030">DM</tspan><tspan fill="#9CA3AF">S</tspan><tspan fill="#C53030">c</tspan></text>
+                </svg>
+                <div class="header-title">Critical Care Medicine II | Week 2</div>
+            </div>
+            <div class="progress-section" id="progressSection" style="display:none;">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <span class="progress-text" id="progressText">Part 1 of 7</span>
+            </div>
+        </div>
+    </header>
+    <main id="main-content" class="main-container">
+        <div class="content-area">
+            <!-- Start Screen -->
+            <div id="startScreen" class="start-screen">
+                <svg class="start-logo" viewBox="0 0 200 50" aria-hidden="true">
+                    <g transform="translate(30,5)"><polygon points="15,8 25,3 35,8 35,18 25,23 15,18" fill="#C53030"/><polygon points="15,22 25,17 35,22 35,32 25,37 15,32" fill="#9CA3AF"/><polygon points="0,15 10,10 20,15 20,25 10,30 0,25" fill="#C53030"/></g>
+                    <text x="80" y="35" font-family="Arial Black" font-size="28" font-weight="900"><tspan fill="#C53030">DM</tspan><tspan fill="#9CA3AF">S</tspan><tspan fill="#C53030">c</tspan></text>
+                </svg>
+                <h1 class="start-title">Hematology &amp; Coagulopathy</h1>
+                <p class="start-subtitle">Interactive Clinical Decision-Making Simulation</p>
+                <div class="objectives-box">
+                    <h2 class="objectives-title">Learning Objectives (Bloom's Taxonomy)</h2>
+                    <div class="objective-item"><span class="objective-level">ANALYZE</span><span>Differentiate between DIC, HIT, TTP, and HUS based on clinical presentation and laboratory findings</span></div>
+                    <div class="objective-item"><span class="objective-level">EVALUATE</span><span>Interpret TEG parameters to guide targeted transfusion therapy in coagulopathy</span></div>
+                    <div class="objective-item"><span class="objective-level">APPLY</span><span>Select appropriate diagnostic workup for a critically ill patient with suspected coagulopathy</span></div>
+                    <div class="objective-item"><span class="objective-level">SYNTHESIZE</span><span>Develop a comprehensive management plan integrating source control, resuscitation, and blood products</span></div>
+                    <div class="objective-item"><span class="objective-level">REMEMBER</span><span>Recall key laboratory features distinguishing consumptive coagulopathies from thrombotic microangiopathies</span></div>
+                </div>
+                <button class="start-btn" onclick="startCase()">Begin Case Simulation</button>
+            </div>
+
+            <!-- Part 1 -->
+            <div id="part1" class="hidden">
+                <div class="section-header"><div class="section-number">Part 1 of 7</div><h2 class="section-title">ICU Deterioration</h2></div>
+                <div class="section-content">
+                    <div class="case-info">
+                        <div class="case-label">Patient Presentation</div>
+                        <p>A 55-year-old male is in the ICU for <strong>septic shock secondary to pneumonia</strong>, ICU day #3. He is intubated and mechanically ventilated, receiving norepinephrine at 0.18 mcg/kg/min.</p>
+                    </div>
+                    <div class="nurse-note">
+                        <div class="nurse-note-label">📞 Nursing Page:</div>
+                        <p>"He's bleeding from his IV sites, has blood in his urine, and petechiae on his chest."</p>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <div class="data-card-title">Vital Signs</div>
+                            <div class="data-row"><span class="data-label">Temperature</span><span class="data-value abnormal">39.1°C</span></div>
+                            <div class="data-row"><span class="data-label">Heart Rate</span><span class="data-value abnormal">126 bpm</span></div>
+                            <div class="data-row"><span class="data-label">Blood Pressure</span><span class="data-value abnormal">86/48 (MAP 61)</span></div>
+                            <div class="data-row"><span class="data-label">SpO₂</span><span class="data-value">93% on FiO₂ 0.60</span></div>
+                            <div class="data-row"><span class="data-label">Urine Output</span><span class="data-value abnormal">0.2 mL/kg/hr × 6 hrs</span></div>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-title">Physical Exam</div>
+                            <div class="data-row"><span class="data-label">IV Sites</span><span class="data-value abnormal">Oozing blood</span></div>
+                            <div class="data-row"><span class="data-label">Oral Mucosa</span><span class="data-value abnormal">Oozing blood</span></div>
+                            <div class="data-row"><span class="data-label">Skin</span><span class="data-value abnormal">Petechiae (chest/arms)</span></div>
+                            <div class="data-row"><span class="data-label">Neuro</span><span class="data-value">No focal changes (sedated)</span></div>
+                            <div class="data-row"><span class="data-label">Abdomen</span><span class="data-value">Mild tenderness</span></div>
+                        </div>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 1</div><p class="question-text">What is your initial approach to this deteriorating patient?</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select one option:</p>
+                        <button class="option-btn" onclick="handlePart1('A')"><strong>A.</strong> Immediately transfuse platelets and FFP</button>
+                        <button class="option-btn" onclick="handlePart1('B')"><strong>B.</strong> Order a broad lab evaluation for coagulopathy and bleeding</button>
+                        <button class="option-btn" onclick="handlePart1('C')"><strong>C.</strong> Stop heparin products and start argatroban immediately</button>
+                        <button class="option-btn" onclick="handlePart1('D')"><strong>D.</strong> Call for emergent CT head/chest/abdomen for occult hemorrhage</button>
+                    </div>
+                    <div id="feedback1A" class="feedback-panel feedback-partial">
+                        <div class="feedback-title">⚠️ Reasonable but Incomplete</div>
+                        <div class="feedback-content">
+                            <p>Empiric transfusion may temporarily reduce bleeding, but without identifying the underlying defect, you risk under- or over-treating.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>Bleeding improves slightly but continues. You still need laboratory data to guide targeted therapy.</p></div>
+                            <button class="continue-btn" onclick="goToPart2()">Continue to Lab Workup →</button>
+                        </div>
+                    </div>
+                    <div id="feedback1B" class="feedback-panel feedback-correct">
+                        <div class="feedback-title">✓ Correct Approach</div>
+                        <div class="feedback-content">
+                            <p>You need data before targeted treatment. The presentation suggests a consumptive coagulopathy, but several diagnoses remain possible including DIC, TTP, HUS, and HIT.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>A systematic approach requires laboratory evaluation to differentiate between conditions with similar presentations but vastly different treatments.</p></div>
+                            <button class="continue-btn" onclick="goToPart2()">Continue to Lab Workup →</button>
+                        </div>
+                    </div>
+                    <div id="feedback1C" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Consider the Clinical Picture</div>
+                        <div class="feedback-content">
+                            <p>HIT causes thrombocytopenia, but diffuse bleeding is not typical. HIT is usually <strong>thrombotic</strong>, not hemorrhagic. Starting argatroban may worsen bleeding.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>The 4T Score helps assess HIT probability: Thrombocytopenia, Timing, Thrombosis, and oTher causes. In this patient with bleeding and sepsis, other diagnoses are more likely.</p></div>
+                            <button class="continue-btn" onclick="goToPart2()">You need more information → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback1D" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Timing Consideration</div>
+                        <div class="feedback-content">
+                            <p>This patient has acute bleeding and is hypotensive. Transporting to CT before resuscitation is dangerous.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p><strong>Don't delay resuscitation to get imaging in an unstable patient.</strong> The bleeding source appears diffuse, suggesting systemic coagulopathy.</p></div>
+                            <button class="continue-btn" onclick="goToPart2()">Stabilize first → Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Part 2: Initial Workup -->
+            <div id="part2" class="hidden">
+                <div class="section-header"><div class="section-number">Part 2 of 7</div><h2 class="section-title">Initial Workup</h2></div>
+                <div class="section-content">
+                    <div class="decision-recap">
+                        <div class="decision-recap-title">📋 Decision Recap</div>
+                        <div class="decision-item"><span>•</span><span>You recognized the need for laboratory evaluation before targeted treatment</span></div>
+                        <div class="decision-item"><span>•</span><span>Patient has diffuse bleeding suggesting systemic coagulopathy</span></div>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 2</div><p class="question-text">Which laboratory studies do you order? Select all that apply.</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select all that apply, then submit:</p>
+                        <label class="checkbox-option" id="opt2A"><input type="checkbox" name="labs" value="A" onchange="toggleCheckbox('opt2A')"><span><strong>A.</strong> CBC with platelets</span></label>
+                        <label class="checkbox-option" id="opt2B"><input type="checkbox" name="labs" value="B" onchange="toggleCheckbox('opt2B')"><span><strong>B.</strong> PT/INR, aPTT</span></label>
+                        <label class="checkbox-option" id="opt2C"><input type="checkbox" name="labs" value="C" onchange="toggleCheckbox('opt2C')"><span><strong>C.</strong> Fibrinogen</span></label>
+                        <label class="checkbox-option" id="opt2D"><input type="checkbox" name="labs" value="D" onchange="toggleCheckbox('opt2D')"><span><strong>D.</strong> D-dimer</span></label>
+                        <label class="checkbox-option" id="opt2E"><input type="checkbox" name="labs" value="E" onchange="toggleCheckbox('opt2E')"><span><strong>E.</strong> CMP</span></label>
+                        <label class="checkbox-option" id="opt2F"><input type="checkbox" name="labs" value="F" onchange="toggleCheckbox('opt2F')"><span><strong>F.</strong> Lactate</span></label>
+                        <label class="checkbox-option" id="opt2G"><input type="checkbox" name="labs" value="G" onchange="toggleCheckbox('opt2G')"><span><strong>G.</strong> Type &amp; Screen / Crossmatch</span></label>
+                        <label class="checkbox-option" id="opt2H"><input type="checkbox" name="labs" value="H" onchange="toggleCheckbox('opt2H')"><span><strong>H.</strong> Peripheral blood smear</span></label>
+                        <label class="checkbox-option" id="opt2I"><input type="checkbox" name="labs" value="I" onchange="toggleCheckbox('opt2I')"><span><strong>I.</strong> Hemolysis labs (LDH, haptoglobin, indirect bili)</span></label>
+                        <label class="checkbox-option" id="opt2J"><input type="checkbox" name="labs" value="J" onchange="toggleCheckbox('opt2J')"><span><strong>J.</strong> HIT testing (PF4 ELISA) + 4Ts score</span></label>
+                        <label class="checkbox-option" id="opt2K"><input type="checkbox" name="labs" value="K" onchange="toggleCheckbox('opt2K')"><span><strong>K.</strong> ADAMTS13 activity</span></label>
+                        <label class="checkbox-option" id="opt2L"><input type="checkbox" name="labs" value="L" onchange="toggleCheckbox('opt2L')"><span><strong>L.</strong> Stool Shiga toxin PCR</span></label>
+                        <label class="checkbox-option" id="opt2M"><input type="checkbox" name="labs" value="M" onchange="toggleCheckbox('opt2M')"><span><strong>M.</strong> TEG/ROTEM</span></label>
+                        <label class="checkbox-option" id="opt2N"><input type="checkbox" name="labs" value="N" onchange="toggleCheckbox('opt2N')"><span><strong>N.</strong> Blood cultures</span></label>
+                        <button class="submit-btn" id="submitLabs" onclick="handlePart2()">Submit Lab Orders</button>
+                    </div>
+                    <div id="feedback2Missing" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Critical Labs Missing</div>
+                        <div class="feedback-content">
+                            <p id="missingLabsText"></p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Essential Labs</div><p><strong>Core labs (A, B, C, G, M)</strong>: CBC, PT/aPTT, fibrinogen, Type &amp; Screen, and TEG are essential for coagulopathy evaluation.</p></div>
+                            <button class="continue-btn" onclick="resetPart2()">← Review and Select Again</button>
+                        </div>
+                    </div>
+                    <div id="feedback2Complete" class="feedback-panel feedback-correct">
+                        <div class="feedback-title">✓ Appropriate Workup Ordered</div>
+                        <div class="feedback-content">
+                            <p>Essential labs ordered: CBC (platelets), PT/aPTT (coagulation cascade), Fibrinogen (consumptive process), Type &amp; Screen (safe transfusion), TEG (functional assessment).</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>Additional tests like D-dimer, hemolysis labs, and peripheral smear help differentiate DIC, TTP, and HUS.</p></div>
+                            <button class="continue-btn" onclick="goToPart3()">Review Results →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 3: Lab Results -->
+            <div id="part3" class="hidden">
+                <div class="section-header"><div class="section-number">Part 3 of 7</div><h2 class="section-title">Laboratory Results</h2></div>
+                <div class="section-content">
+                    <div class="decision-recap">
+                        <div class="decision-recap-title">📋 Decision Recap</div>
+                        <div class="decision-item"><span>✓</span><span>Ordered comprehensive coagulopathy workup including TEG</span></div>
+                        <div class="decision-item"><span>✓</span><span>Type &amp; Screen obtained for safe transfusion</span></div>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <div class="data-card-title">Coagulation Studies</div>
+                            <div class="data-row"><span class="data-label">Platelets</span><span class="data-value abnormal">38,000/µL (↓ from 165k)</span></div>
+                            <div class="data-row"><span class="data-label">PT</span><span class="data-value abnormal">24 sec (ref: 11-13.5)</span></div>
+                            <div class="data-row"><span class="data-label">INR</span><span class="data-value abnormal">2.4</span></div>
+                            <div class="data-row"><span class="data-label">aPTT</span><span class="data-value abnormal">68 sec (ref: 25-35)</span></div>
+                            <div class="data-row"><span class="data-label">Fibrinogen</span><span class="data-value abnormal">90 mg/dL (ref: 200-400)</span></div>
+                            <div class="data-row"><span class="data-label">D-dimer</span><span class="data-value abnormal">Markedly elevated</span></div>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-title">Hemolysis &amp; Other</div>
+                            <div class="data-row"><span class="data-label">LDH</span><span class="data-value">Mildly elevated</span></div>
+                            <div class="data-row"><span class="data-label">Haptoglobin</span><span class="data-value">Normal</span></div>
+                            <div class="data-row"><span class="data-label">Peripheral Smear</span><span class="data-value">Rare schistocytes</span></div>
+                            <div class="data-row"><span class="data-label">Creatinine</span><span class="data-value abnormal">2.1 mg/dL (AKI)</span></div>
+                            <div class="data-row"><span class="data-label">Lactate</span><span class="data-value abnormal">5.2 mmol/L</span></div>
+                        </div>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 3</div><p class="question-text">Which diagnosis best explains this laboratory pattern?</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select one option:</p>
+                        <button class="option-btn" onclick="handlePart3('A')"><strong>A.</strong> Disseminated Intravascular Coagulation (DIC)</button>
+                        <button class="option-btn" onclick="handlePart3('B')"><strong>B.</strong> Heparin-Induced Thrombocytopenia (HIT)</button>
+                        <button class="option-btn" onclick="handlePart3('C')"><strong>C.</strong> Thrombotic Thrombocytopenic Purpura (TTP)</button>
+                        <button class="option-btn" onclick="handlePart3('D')"><strong>D.</strong> Hemolytic Uremic Syndrome (HUS)</button>
+                        <button class="option-btn" onclick="handlePart3('E')"><strong>E.</strong> Liver failure-related coagulopathy</button>
+                    </div>
+                    <div id="feedback3A" class="feedback-panel feedback-correct">
+                        <div class="feedback-title">✓ Correct Diagnosis</div>
+                        <div class="feedback-content">
+                            <p>Classic DIC findings: <strong>Thrombocytopenia</strong> (38k), <strong>prolonged PT/aPTT</strong>, <strong>low fibrinogen</strong> (90), <strong>elevated D-dimer</strong>, with <strong>sepsis</strong> as trigger.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>DIC has global coagulation activation consuming platelets AND clotting factors. This distinguishes it from TTP/HUS where PT/aPTT and fibrinogen are typically normal.</p></div>
+                            <button class="continue-btn" onclick="goToPart4()">Proceed to Management →</button>
+                        </div>
+                    </div>
+                    <div id="feedback3B" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Consider the Lab Pattern</div>
+                        <div class="feedback-content">
+                            <p>HIT does NOT prolong PT/aPTT or reduce fibrinogen. In HIT: platelets drop, but PT/aPTT and fibrinogen stay <strong>normal</strong>. Primary complication is <strong>thrombosis</strong>, not bleeding.</p>
+                            <button class="continue-btn" onclick="goToPart4()">The correct diagnosis is DIC → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback3C" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Compare Lab Patterns</div>
+                        <div class="feedback-content">
+                            <p>TTP: PT/aPTT <strong>normal</strong>, fibrinogen <strong>normal</strong>, haptoglobin very <strong>low</strong>, <strong>abundant</strong> schistocytes. This patient has abnormal coagulation studies inconsistent with TTP.</p>
+                            <button class="continue-btn" onclick="goToPart4()">The correct diagnosis is DIC → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback3D" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Compare Lab Patterns</div>
+                        <div class="feedback-content">
+                            <p>HUS: PT/aPTT <strong>normal</strong>, fibrinogen <strong>normal</strong>, profound hemolysis (low haptoglobin). Often preceded by diarrheal illness. This patient's coagulation abnormalities point to DIC.</p>
+                            <button class="continue-btn" onclick="goToPart4()">The correct diagnosis is DIC → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback3E" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Consider Acute Change</div>
+                        <div class="feedback-content">
+                            <p>Liver disease causes gradual changes. The <strong>acute platelet drop</strong> (165k → 38k in 24 hours) with <strong>very low fibrinogen</strong> and <strong>elevated D-dimer</strong> in sepsis strongly suggests DIC.</p>
+                            <button class="continue-btn" onclick="goToPart4()">The correct diagnosis is DIC → Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Part 4: Management -->
+            <div id="part4" class="hidden">
+                <div class="section-header"><div class="section-number">Part 4 of 7</div><h2 class="section-title">Managing DIC</h2></div>
+                <div class="section-content">
+                    <div class="decision-recap">
+                        <div class="decision-recap-title">📋 Decision Recap</div>
+                        <div class="decision-item"><span>✓</span><span>Diagnosis: Sepsis-associated DIC (bleeding phenotype)</span></div>
+                        <div class="decision-item"><span>•</span><span>Key: Thrombocytopenia + prolonged PT/aPTT + low fibrinogen + elevated D-dimer</span></div>
+                    </div>
+                    <div class="case-info">
+                        <div class="case-label">Clinical Status</div>
+                        <p>Patient continues oozing from IV sites. BP 86/48 on norepinephrine 0.18 mcg/kg/min. DIC confirmed.</p>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 4</div><p class="question-text">What are your immediate management priorities? Select all that apply.</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select all that apply, then submit:</p>
+                        <label class="checkbox-option" id="opt4A"><input type="checkbox" name="mgmt" value="A" onchange="toggleCheckbox('opt4A')"><span><strong>A.</strong> Treat underlying sepsis aggressively (antibiotics, source control)</span></label>
+                        <label class="checkbox-option" id="opt4B"><input type="checkbox" name="mgmt" value="B" onchange="toggleCheckbox('opt4B')"><span><strong>B.</strong> Transfuse blood products using TEG guidance</span></label>
+                        <label class="checkbox-option" id="opt4C"><input type="checkbox" name="mgmt" value="C" onchange="toggleCheckbox('opt4C')"><span><strong>C.</strong> Transfuse 2 units of FFP empirically</span></label>
+                        <label class="checkbox-option" id="opt4D"><input type="checkbox" name="mgmt" value="D" onchange="toggleCheckbox('opt4D')"><span><strong>D.</strong> Start therapeutic heparin</span></label>
+                        <label class="checkbox-option" id="opt4E"><input type="checkbox" name="mgmt" value="E" onchange="toggleCheckbox('opt4E')"><span><strong>E.</strong> Remove all central venous and arterial lines</span></label>
+                        <button class="submit-btn" id="submitMgmt" onclick="handlePart4()">Submit Management Plan</button>
+                    </div>
+                    <div id="feedback4" class="feedback-panel"><div class="feedback-title" id="feedback4Title"></div><div class="feedback-content" id="feedback4Content"></div></div>
+                </div>
+            </div>
+
+            <!-- Part 5: TEG -->
+            <div id="part5" class="hidden">
+                <div class="section-header"><div class="section-number">Part 5 of 7</div><h2 class="section-title">TEG-Guided Transfusion</h2></div>
+                <div class="section-content">
+                    <div class="decision-recap">
+                        <div class="decision-recap-title">📋 Decision Recap</div>
+                        <div class="decision-item"><span>✓</span><span>Continuing aggressive sepsis treatment</span></div>
+                        <div class="decision-item"><span>✓</span><span>Using TEG to guide targeted transfusion</span></div>
+                    </div>
+                    <div class="teg-visual">
+                        <div class="teg-title">Thromboelastography (TEG) Results</div>
+                        <div class="teg-image">
+                            <svg viewBox="0 0 400 120" style="width:100%;height:100%">
+                                <path d="M 20,60 L 80,60 C 100,60 110,50 120,35 L 140,35 C 200,35 240,35 280,38 C 320,41 360,50 380,60" stroke="#4B5563" stroke-width="1" fill="none" stroke-dasharray="4,4" opacity="0.5"/>
+                                <path d="M 20,60 L 80,60 C 100,60 110,70 120,85 L 140,85 C 200,85 240,85 280,82 C 320,79 360,70 380,60" stroke="#4B5563" stroke-width="1" fill="none" stroke-dasharray="4,4" opacity="0.5"/>
+                                <path d="M 20,60 L 140,60 C 170,60 190,52 220,45 L 260,45 C 300,45 340,48 380,55" stroke="#EF4444" stroke-width="2" fill="none"/>
+                                <path d="M 20,60 L 140,60 C 170,60 190,68 220,75 L 260,75 C 300,75 340,72 380,65" stroke="#EF4444" stroke-width="2" fill="none"/>
+                                <text x="50" y="100" fill="#9CA3AF" font-size="10">R time</text>
+                                <text x="160" y="100" fill="#9CA3AF" font-size="10">K time</text>
+                                <text x="290" y="60" fill="#9CA3AF" font-size="10">MA</text>
+                            </svg>
+                        </div>
+                        <div class="teg-parameters">
+                            <div class="teg-param"><div class="teg-param-label">R Time</div><div class="teg-param-value abnormal">18 min (↑)</div></div>
+                            <div class="teg-param"><div class="teg-param-label">K Time</div><div class="teg-param-value abnormal">6.2 min (↑)</div></div>
+                            <div class="teg-param"><div class="teg-param-label">Alpha Angle</div><div class="teg-param-value abnormal">42° (↓)</div></div>
+                            <div class="teg-param"><div class="teg-param-label">MA</div><div class="teg-param-value abnormal">38 mm (↓)</div></div>
+                            <div class="teg-param" style="grid-column:span 2"><div class="teg-param-label">LY30</div><div class="teg-param-value">Normal</div></div>
+                        </div>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 5</div><p class="question-text">Based on TEG results, which blood products are indicated? Select all that apply.</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select all that apply, then submit:</p>
+                        <label class="checkbox-option" id="opt5A"><input type="checkbox" name="products" value="A" onchange="toggleCheckbox('opt5A')"><span><strong>A.</strong> Fresh Frozen Plasma (FFP)</span></label>
+                        <label class="checkbox-option" id="opt5B"><input type="checkbox" name="products" value="B" onchange="toggleCheckbox('opt5B')"><span><strong>B.</strong> Cryoprecipitate</span></label>
+                        <label class="checkbox-option" id="opt5C"><input type="checkbox" name="products" value="C" onchange="toggleCheckbox('opt5C')"><span><strong>C.</strong> Platelets</span></label>
+                        <label class="checkbox-option" id="opt5D"><input type="checkbox" name="products" value="D" onchange="toggleCheckbox('opt5D')"><span><strong>D.</strong> Tranexamic Acid (TXA)</span></label>
+                        <label class="checkbox-option" id="opt5E"><input type="checkbox" name="products" value="E" onchange="toggleCheckbox('opt5E')"><span><strong>E.</strong> Prothrombin Complex Concentrate (PCC)</span></label>
+                        <button class="submit-btn" id="submitProducts" onclick="handlePart5()">Submit Transfusion Orders</button>
+                    </div>
+                    <div id="feedback5" class="feedback-panel"><div class="feedback-title" id="feedback5Title"></div><div class="feedback-content" id="feedback5Content"></div></div>
+                </div>
+            </div>
+
+            <!-- Part 6: Reassessment -->
+            <div id="part6" class="hidden">
+                <div class="section-header"><div class="section-number">Part 6 of 7</div><h2 class="section-title">Reassessment</h2></div>
+                <div class="section-content">
+                    <div class="decision-recap">
+                        <div class="decision-recap-title">📋 Decision Recap</div>
+                        <div class="decision-item"><span>✓</span><span>FFP for prolonged R time (factor deficiency)</span></div>
+                        <div class="decision-item"><span>✓</span><span>Cryoprecipitate for prolonged K time/low alpha (fibrinogen)</span></div>
+                        <div class="decision-item"><span>✓</span><span>Platelets for low MA (platelet dysfunction)</span></div>
+                    </div>
+                    <div class="case-info" style="border-left-color:#047857;background:#D1FAE5;">
+                        <div class="case-label" style="color:#047857;">Post-Transfusion Status</div>
+                        <p>Platelets: <strong>72,000</strong> (↑ from 38k) | Fibrinogen: <strong>160</strong> (↑ from 90) | INR: <strong>1.6</strong> (↓ from 2.4) | Bleeding: <strong style="color:#047857;">Resolved</strong> | Vasopressor requirement: <strong style="color:#047857;">Decreasing</strong></p>
+                    </div>
+                    <div class="question-box"><div class="question-number">Question 6</div><p class="question-text">What is the most important ongoing management step?</p></div>
+                    <div class="options-container">
+                        <p class="option-type-label">Select one option:</p>
+                        <button class="option-btn" onclick="handlePart6('A')"><strong>A.</strong> Continue directed treatment of sepsis</button>
+                        <button class="option-btn" onclick="handlePart6('B')"><strong>B.</strong> Start therapeutic anticoagulation</button>
+                        <button class="option-btn" onclick="handlePart6('C')"><strong>C.</strong> Continue scheduled transfusion until labs normalize</button>
+                        <button class="option-btn" onclick="handlePart6('D')"><strong>D.</strong> Start corticosteroids to suppress inflammation</button>
+                    </div>
+                    <div id="feedback6A" class="feedback-panel feedback-correct">
+                        <div class="feedback-title">✓ Correct</div>
+                        <div class="feedback-content">
+                            <p><strong>DIC resolves only when the underlying cause is controlled.</strong> Continue antibiotics, pursue source control, support hemodynamics.</p>
+                            <div class="clinical-pearl"><div class="clinical-pearl-label">Clinical Pearl</div><p>Blood products address consequences of DIC but not the cause. Without treating sepsis, the consumptive process continues.</p></div>
+                            <button class="continue-btn" onclick="goToPart7()">Complete Case →</button>
+                        </div>
+                    </div>
+                    <div id="feedback6B" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Caution</div>
+                        <div class="feedback-content">
+                            <p>No indication for therapeutic anticoagulation in <strong>bleeding-predominant DIC</strong>. May worsen hemorrhage. (Consider DVT prophylaxis once bleeding resolves.)</p>
+                            <button class="continue-btn" onclick="goToPart7()">Correct answer: treat sepsis → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback6C" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ Goal-Directed, Not Lab-Driven</div>
+                        <div class="feedback-content">
+                            <p>Transfuse for active bleeding or procedures, not to normalize labs. Risks: volume overload, TRALI, thrombosis.</p>
+                            <button class="continue-btn" onclick="goToPart7()">Correct answer: treat sepsis → Continue</button>
+                        </div>
+                    </div>
+                    <div id="feedback6D" class="feedback-panel feedback-incorrect">
+                        <div class="feedback-title">⚠️ No Evidence</div>
+                        <div class="feedback-content">
+                            <p>No evidence supports corticosteroids specifically for DIC treatment. They do not correct consumptive coagulopathy.</p>
+                            <button class="continue-btn" onclick="goToPart7()">Correct answer: treat sepsis → Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Part 7: Outcome -->
+            <div id="part7" class="hidden">
+                <div class="section-header"><div class="section-number">Part 7 of 7</div><h2 class="section-title">Final Diagnosis &amp; Outcome</h2></div>
+                <div class="section-content">
+                    <div class="case-info" style="border-left-color:#047857;background:#D1FAE5;">
+                        <div class="case-label" style="color:#047857;">Final Diagnosis</div>
+                        <p style="font-weight:700;font-size:1.125rem;">Sepsis-associated Disseminated Intravascular Coagulation (Bleeding Phenotype)</p>
+                    </div>
+                    <div class="case-info">
+                        <div class="case-label">Patient Outcome</div>
+                        <p>With source control, antibiotics, and TEG-guided transfusion:</p>
+                        <ul style="margin:1rem 0;padding-left:1.5rem;">
+                            <li>Vasopressors weaned off</li>
+                            <li>Coagulation studies normalize</li>
+                            <li>No further bleeding</li>
+                            <li>Eventually transferred out of ICU</li>
+                        </ul>
+                    </div>
+                    <div class="decision-recap" style="padding:1.5rem;">
+                        <div class="decision-recap-title" style="font-size:1.125rem;">📋 Complete Decision Summary</div>
+                        <div class="decision-item"><span>1.</span><span><strong>Initial approach:</strong> Lab workup before empiric treatment</span></div>
+                        <div class="decision-item"><span>2.</span><span><strong>Labs:</strong> CBC, PT/aPTT, fibrinogen, Type&amp;Screen, TEG</span></div>
+                        <div class="decision-item"><span>3.</span><span><strong>Diagnosis:</strong> DIC (thrombocytopenia + prolonged PT/aPTT + low fibrinogen + elevated D-dimer)</span></div>
+                        <div class="decision-item"><span>4.</span><span><strong>Management:</strong> Treat sepsis + TEG-guided transfusion</span></div>
+                        <div class="decision-item"><span>5.</span><span><strong>TEG:</strong> FFP for R, Cryo for K/alpha, Platelets for MA</span></div>
+                        <div class="decision-item"><span>6.</span><span><strong>Ongoing:</strong> Continue sepsis treatment - DIC resolves with underlying cause</span></div>
+                    </div>
+                    <div style="text-align:center;margin-top:2rem;">
+                        <button class="continue-btn" onclick="showCertificate()" style="font-size:1.125rem;padding:1rem 2.5rem;">Generate Completion Certificate →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificate -->
+            <div id="certificateSection" class="certificate-section">
+                <div class="certificate" id="certificate">
+                    <svg style="height:60px;margin-bottom:1.5rem;" viewBox="0 0 200 50">
+                        <g transform="translate(30,5)"><polygon points="15,8 25,3 35,8 35,18 25,23 15,18" fill="#C53030"/><polygon points="15,22 25,17 35,22 35,32 25,37 15,32" fill="#9CA3AF"/><polygon points="0,15 10,10 20,15 20,25 10,30 0,25" fill="#C53030"/></g>
+                        <text x="80" y="35" font-family="Arial Black" font-size="28" font-weight="900"><tspan fill="#C53030">DM</tspan><tspan fill="#9CA3AF">S</tspan><tspan fill="#C53030">c</tspan></text>
+                    </svg>
+                    <h2 class="certificate-title">Certificate of Completion</h2>
+                    <p class="certificate-subtitle">University of Lynchburg DMSc Program</p>
+                    <div style="margin:2rem 0;">
+                        <label for="studentName" style="display:block;margin-bottom:0.5rem;color:#4B5563;">Enter Your Name:</label>
+                        <input type="text" id="studentName" placeholder="Your Full Name" style="padding:0.75rem 1rem;font-size:1.125rem;border:2px solid #D1D5DB;border-radius:8px;width:100%;max-width:400px;text-align:center;" onchange="updateCertificateName()">
+                    </div>
+                    <div class="certificate-name" id="certName">Student Name</div>
+                    <p class="certificate-body">has successfully completed the interactive clinical simulation<br><br><span class="certificate-course">Critical Care Medicine II: Week 2<br>Hematology &amp; Coagulopathy - DIC Case Study</span></p>
+                    <p class="certificate-date" id="certDate"></p>
+                    <div class="certificate-footer">
+                        <div class="signature-block"><div class="signature-line"></div><div class="signature-name">Dakoda Farrington, DMSc, PA-C<br>Course Instructor</div></div>
+                        <div class="signature-block"><div class="signature-line"></div><div class="signature-name">University of Lynchburg<br>DMSc Program</div></div>
+                    </div>
+                </div>
+                <button class="download-btn" onclick="downloadCertificate()">📥 Download Certificate (PDF)</button>
+                <p style="margin-top:1rem;color:#4B5563;font-size:0.875rem;">Save and upload to your LMS to document completion.</p>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-header">📚 Key Reference Points</div>
+                <div class="sidebar-content">
+                    <div class="key-point"><div class="key-point-title">DIC Hallmarks</div><p>Thrombocytopenia + prolonged PT/aPTT + low fibrinogen + elevated D-dimer</p></div>
+                    <div class="key-point"><div class="key-point-title">TTP/HUS vs DIC</div><p>TTP/HUS: PT/aPTT and fibrinogen typically normal</p></div>
+                    <div class="key-point"><div class="key-point-title">HIT Clue</div><p>HIT is thrombotic, not hemorrhagic. Normal PT/aPTT.</p></div>
+                    <div class="key-point"><div class="key-point-title">TEG Interpretation</div><p>R time → Factors (FFP)<br>K time/α → Fibrinogen (Cryo)<br>MA → Platelets<br>LY30 → Fibrinolysis (TXA)</p></div>
+                    <div class="key-point"><div class="key-point-title">DIC Management</div><p>Treat underlying cause. Transfuse to control bleeding, not to normalize labs.</p></div>
+                    <div class="key-point"><div class="key-point-title">ISTH DIC Score</div><p>Score ≥5 = overt DIC. Uses: platelets, PT, fibrinogen, D-dimer.</p></div>
+                    <div class="key-point"><div class="key-point-title">4T Score (HIT)</div><p>Thrombocytopenia, Timing, Thrombosis, oTher causes</p></div>
+                    <div class="key-point"><div class="key-point-title">PLASMIC Score (TTP)</div><p>Predicts ADAMTS13 deficiency likelihood</p></div>
+                </div>
+            </div>
+        </aside>
+    </main>
+    <script>
+        let currentPart = 0;
+        const totalParts = 7;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('certDate').textContent = 'Completed: ' + today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        });
+
+        function startCase() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('part1').classList.remove('hidden');
+            document.getElementById('progressSection').style.display = 'flex';
+            currentPart = 1;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            document.getElementById('progressFill').style.width = (currentPart / totalParts * 100) + '%';
+            document.getElementById('progressText').textContent = 'Part ' + currentPart + ' of ' + totalParts;
+        }
+
+        function toggleCheckbox(id) {
+            const opt = document.getElementById(id);
+            opt.classList.toggle('selected', opt.querySelector('input').checked);
+        }
+
+        function handlePart1(answer) {
+            document.querySelectorAll('#part1 .feedback-panel').forEach(el => el.classList.remove('show'));
+            document.getElementById('feedback1' + answer).classList.add('show');
+            document.querySelectorAll('#part1 .option-btn').forEach(btn => { btn.disabled = true; btn.style.opacity = '0.6'; btn.style.cursor = 'default'; });
+        }
+
+        function goToPart2() {
+            document.getElementById('part1').classList.add('hidden');
+            document.getElementById('part2').classList.remove('hidden');
+            currentPart = 2;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function handlePart2() {
+            const selected = Array.from(document.querySelectorAll('#part2 input:checked')).map(cb => cb.value);
+            const coreLabs = ['A', 'B', 'C', 'G', 'M'];
+            const missing = coreLabs.filter(lab => !selected.includes(lab));
+            
+            if (missing.length > 0) {
+                const names = {A:'CBC', B:'PT/aPTT', C:'Fibrinogen', G:'Type & Screen', M:'TEG'};
+                document.getElementById('missingLabsText').innerHTML = '<strong>Missing:</strong> ' + missing.map(m => names[m]).join(', ');
+                document.getElementById('feedback2Missing').classList.add('show');
+                document.getElementById('feedback2Complete').classList.remove('show');
+            } else {
+                document.getElementById('feedback2Missing').classList.remove('show');
+                document.getElementById('feedback2Complete').classList.add('show');
+                document.querySelectorAll('#part2 input').forEach(cb => cb.disabled = true);
+                document.getElementById('submitLabs').disabled = true;
+            }
+        }
+
+        function resetPart2() { document.getElementById('feedback2Missing').classList.remove('show'); }
+
+        function goToPart3() {
+            document.getElementById('part2').classList.add('hidden');
+            document.getElementById('part3').classList.remove('hidden');
+            currentPart = 3;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function handlePart3(answer) {
+            document.querySelectorAll('#part3 .feedback-panel').forEach(el => el.classList.remove('show'));
+            document.getElementById('feedback3' + answer).classList.add('show');
+            document.querySelectorAll('#part3 .option-btn').forEach(btn => { btn.disabled = true; btn.style.opacity = '0.6'; btn.style.cursor = 'default'; });
+        }
+
+        function goToPart4() {
+            document.getElementById('part3').classList.add('hidden');
+            document.getElementById('part4').classList.remove('hidden');
+            currentPart = 4;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function handlePart4() {
+            const selected = Array.from(document.querySelectorAll('#part4 input:checked')).map(cb => cb.value);
+            const hasA = selected.includes('A'), hasB = selected.includes('B'), hasD = selected.includes('D'), hasE = selected.includes('E');
+            const feedback = document.getElementById('feedback4');
+            const title = document.getElementById('feedback4Title');
+            const content = document.getElementById('feedback4Content');
+            
+            let html = '', cls = '';
+            if (hasA && hasB && !hasD && !hasE) {
+                cls = 'feedback-correct';
+                title.innerHTML = '✓ Optimal Management';
+                html = '<p>Excellent! Treat sepsis (DIC resolves with underlying cause) + TEG-guided transfusion (targeted therapy).</p>';
+            } else if (hasA && hasB) {
+                cls = 'feedback-partial';
+                title.innerHTML = '⚠️ Partially Correct';
+                html = '<p>You selected correct priorities but also problematic options:</p><ul>';
+                if (hasD) html += '<li>Heparin: Contraindicated in bleeding DIC</li>';
+                if (hasE) html += '<li>Removing lines: Unnecessary, may cause bleeding</li>';
+                html += '</ul>';
+            } else {
+                cls = 'feedback-incorrect';
+                title.innerHTML = '⚠️ Reconsider';
+                html = '<ul>';
+                if (!hasA) html += '<li>Missing: Treat sepsis - most important!</li>';
+                if (!hasB) html += '<li>Missing: TEG-guided transfusion</li>';
+                if (hasD) html += '<li>Heparin: Contraindicated</li>';
+                if (hasE) html += '<li>Line removal: Unnecessary</li>';
+                html += '</ul>';
+            }
+            html += '<div class="clinical-pearl"><div class="clinical-pearl-label">Key Point</div><p>DIC management cornerstone: treat the underlying cause.</p></div><button class="continue-btn" onclick="goToPart5()">Continue to TEG →</button>';
+            feedback.className = 'feedback-panel ' + cls + ' show';
+            content.innerHTML = html;
+            document.querySelectorAll('#part4 input').forEach(cb => cb.disabled = true);
+            document.getElementById('submitMgmt').disabled = true;
+        }
+
+        function goToPart5() {
+            document.getElementById('part4').classList.add('hidden');
+            document.getElementById('part5').classList.remove('hidden');
+            currentPart = 5;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function handlePart5() {
+            const selected = Array.from(document.querySelectorAll('#part5 input:checked')).map(cb => cb.value);
+            const hasA = selected.includes('A'), hasB = selected.includes('B'), hasC = selected.includes('C');
+            const hasD = selected.includes('D'), hasE = selected.includes('E');
+            const correct = [hasA, hasB, hasC].filter(x => x).length;
+            const incorrect = [hasD, hasE].filter(x => x).length;
+            
+            const feedback = document.getElementById('feedback5');
+            const title = document.getElementById('feedback5Title');
+            const content = document.getElementById('feedback5Content');
+            
+            let html = '', cls = '';
+            if (correct === 3 && incorrect === 0) {
+                cls = 'feedback-correct';
+                title.innerHTML = '✓ Perfect TEG Interpretation';
+                html = '<p>FFP (R time), Cryoprecipitate (K/alpha), Platelets (MA) - all correctly matched!</p><button class="continue-btn" onclick="goToPart6()">Continue →</button>';
+                document.querySelectorAll('#part5 input').forEach(cb => cb.disabled = true);
+                document.getElementById('submitProducts').disabled = true;
+            } else if (correct < 3 && incorrect === 0) {
+                cls = 'feedback-partial';
+                title.innerHTML = '⚠️ Incomplete - Bleeding Continues';
+                html = '<p>Missing products:</p><ul>';
+                if (!hasA) html += '<li>FFP for prolonged R time</li>';
+                if (!hasB) html += '<li>Cryo for K time/alpha angle</li>';
+                if (!hasC) html += '<li>Platelets for low MA</li>';
+                html += '</ul><button class="continue-btn" onclick="resetPart5()">← Reassess</button>';
+            } else {
+                cls = 'feedback-incorrect';
+                title.innerHTML = '⚠️ Incorrect Selection';
+                html = '<ul>';
+                if (hasD) html += '<li>TXA: Only for elevated LY30 (fibrinolysis). LY30 is normal here.</li>';
+                if (hasE) html += '<li>PCC: Does not address fibrinogen or platelets in global DIC.</li>';
+                html += '</ul><button class="continue-btn" onclick="resetPart5()">← Reassess</button>';
+            }
+            feedback.className = 'feedback-panel ' + cls + ' show';
+            content.innerHTML = html;
+        }
+
+        function resetPart5() { document.getElementById('feedback5').classList.remove('show'); }
+
+        function goToPart6() {
+            document.getElementById('part5').classList.add('hidden');
+            document.getElementById('part6').classList.remove('hidden');
+            currentPart = 6;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function handlePart6(answer) {
+            document.querySelectorAll('#part6 .feedback-panel').forEach(el => el.classList.remove('show'));
+            document.getElementById('feedback6' + answer).classList.add('show');
+            document.querySelectorAll('#part6 .option-btn').forEach(btn => { btn.disabled = true; btn.style.opacity = '0.6'; btn.style.cursor = 'default'; });
+        }
+
+        function goToPart7() {
+            document.getElementById('part6').classList.add('hidden');
+            document.getElementById('part7').classList.remove('hidden');
+            currentPart = 7;
+            updateProgress();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function showCertificate() {
+            document.getElementById('part7').classList.add('hidden');
+            document.getElementById('certificateSection').classList.add('show');
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function updateCertificateName() {
+            document.getElementById('certName').textContent = document.getElementById('studentName').value || 'Student Name';
+        }
+
+        function downloadCertificate() {
+            const name = document.getElementById('studentName').value;
+            if (!name) { alert('Please enter your name.'); return; }
+            const w = window.open('', '_blank');
+            w.document.write(`<!DOCTYPE html><html><head><title>Certificate - ${name}</title><style>body{font-family:Georgia,serif;padding:40px;text-align:center}.cert{border:4px double #C53030;padding:40px;max-width:700px;margin:0 auto}.logo{font-family:Arial Black;font-size:24px;margin-bottom:20px}.red{color:#C53030}.gray{color:#9CA3AF}.title{font-size:28px;color:#C53030;margin-bottom:10px}.subtitle{font-size:16px;color:#666;margin-bottom:30px}.name{font-size:24px;border-bottom:2px solid #C53030;display:inline-block;padding:10px 40px;margin-bottom:20px}.body{font-size:14px;line-height:1.8;margin-bottom:20px}.course{font-weight:bold;color:#C53030}.date{font-size:12px;color:#666;margin-bottom:30px}.footer{display:flex;justify-content:space-between;border-top:1px solid #ddd;padding-top:20px;margin-top:20px}.sig{text-align:center}.sig-line{width:180px;border-bottom:1px solid #333;margin-bottom:5px}.sig-name{font-size:12px;color:#666}@media print{body{padding:0}}</style></head><body><div class="cert"><div class="logo"><span class="red">DM</span><span class="gray">S</span><span class="red">c</span></div><h1 class="title">Certificate of Completion</h1><p class="subtitle">University of Lynchburg DMSc Program</p><div class="name">${name}</div><p class="body">has successfully completed<br><br><span class="course">Critical Care Medicine II: Week 2<br>Hematology & Coagulopathy - DIC Case Study</span></p><p class="date">${document.getElementById('certDate').textContent}</p><div class="footer"><div class="sig"><div class="sig-line"></div><div class="sig-name">Dakoda Farrington, DMSc, PA-C<br>Course Instructor</div></div><div class="sig"><div class="sig-line"></div><div class="sig-name">University of Lynchburg<br>DMSc Program</div></div></div></div><script>window.onload=function(){window.print()}<\/script></body></html>`);
+            w.document.close();
+        }
+    </script>
+</body>
+</html>
